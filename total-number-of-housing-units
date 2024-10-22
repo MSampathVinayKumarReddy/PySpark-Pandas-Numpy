@@ -1,0 +1,33 @@
+Question - https://platform.stratascratch.com/coding/10167-total-number-of-housing-units?code_type=5
+
+AirBnB
+
+SQL
+-----------------
+select year, 
+sum(south + west + midwest + northeast)AS n_units
+from housing_units_completed_us
+GROUP BY YEAR
+ORDER BY YEAR
+
+Pandas
+------------------
+import pandas as pd
+housing_us = housing_units_completed_us
+
+housing_us['total'] = housing_us['south']+housing_us['west']+housing_us['midwest']+housing_us['northeast']
+result = housing_us.groupby('year').sum()['total'].reset_index()
+
+result
+
+PySpark
+------------------
+from pyspark.sql.functions import sum
+import pandas as pd
+housing_us = housing_units_completed_us
+
+housing_us = housing_us.withColumn("total", housing_us["south"] + housing_us["west"] + housing_us["midwest"] + housing_us["northeast"])
+
+result = housing_us.groupBy("year").agg(sum("total").alias("total")).orderBy("year")
+
+result.toPandas()
