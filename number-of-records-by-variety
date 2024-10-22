@@ -2,6 +2,13 @@ Question - https://platform.stratascratch.com/coding/10168-number-of-records-by-
 
 Microsoft
 
+SQL
+-----------------------------
+select variety, count(*) 
+from iris
+group by variety
+
+
 Pandas
 ------------------------------
 import pandas as pd
@@ -15,5 +22,5 @@ import pandas as pd
 
 iris_df = iris.groupBy("variety").agg(count("sepal_length").alias("count")).orderBy("variety")
 
-#need to convert to pandas to get the output in Stratascratch
+#need to convert to pandas to get the output in Stratascratch else not required
 iris_df.toPandas()
