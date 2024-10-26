@@ -1,0 +1,33 @@
+Question - https://platform.stratascratch.com/coding/10183-total-cost-of-orders?code_type=5
+
+Amazon
+
+SQL
+----------------
+SELECT a.id, a.first_name, sum(b.total_order_cost) as total_cost
+from customers a
+join orders b
+on a.id = b.cust_id
+group by a.id, a.first_name
+order by a.first_name
+
+Pandas
+-----------------
+import pandas as pd
+
+res = pd.merge(customers, orders, left_on = "id", right_on = "cust_id")
+
+res = res.groupby(["cust_id", "first_name"])["total_order_cost"].sum().reset_index().sort_values(by = "first_name")
+
+#same like above SQL code u can take id, name from customer table
+res = res.groupby(["id_x", "first_name"])["total_order_cost"].sum().reset_index().sort_values(by = "first_name")
+
+
+PySpark
+------------------
+import pyspark.sql.functions as F
+
+merge = customers.join(orders, customers.id == orders.cust_id)
+merge = merge.groupby("cust_id", "first_name").agg(F.sum("total_order_cost").alias("total_order_cost"))
+result = merge.orderBy("first_name", ascending=True)
+result.toPandas()
