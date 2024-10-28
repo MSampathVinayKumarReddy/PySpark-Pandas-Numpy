@@ -1,0 +1,27 @@
+Question -  https://platform.stratascratch.com/coding/10277-find-all-inspections-which-are-part-of-an-inactive-program?code_type=5
+
+City of Los Angeles
+
+SQL
+------------
+select * 
+from los_angeles_restaurant_health_inspections
+where program_status = 'INACTIVE'
+
+
+Pandas
+------------
+import pandas as pd
+
+sol = los_angeles_restaurant_health_inspections
+sol = sol[sol["program_status"] == "INACTIVE"]
+
+sol
+
+
+PySpark
+---------------
+
+sol = los_angeles_restaurant_health_inspections.filter("program_status == 'INACTIVE'")
+
+sol.toPandas()
