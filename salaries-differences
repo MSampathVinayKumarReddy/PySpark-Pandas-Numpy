@@ -1,0 +1,54 @@
+Question - https://platform.stratascratch.com/coding/10308-salaries-differences?code_type=5
+
+LinkedIn
+
+SQL
+----------
+select
+(
+(select max(a.salary) as a
+from db_employee as a
+join db_dept as b
+on a.department_id = b.id
+where b.department = 'marketing')
+-
+(select max(a.salary) as a
+from db_employee as a
+join db_dept as b
+on a.department_id = b.id
+where b.department = 'engineering')
+) as difference
+
+
+Python
+-----------
+
+import pandas as pd
+
+df = pd.merge(db_employee, db_dept, how = "inner", left_on = 'department_id', right_on = 'id')
+
+eng_high = df[df["department"] == "engineering"]["salary"].max()
+mark_high = df[df["department"] == "marketing"]["salary"].max()
+
+diff = abs(eng_high - mark_high)
+
+res = pd.DataFrame({'sal_diff': [diff]})
+res
+
+
+PySpark
+-------------
+import pyspark.sql.functions as F
+
+df = db_employee.join(db_dept, db_employee.department_id == db_dept.id, "inner")
+
+df_eng = df.filter(df["department"] == "engineering").groupBy().max("salary").collect()[0][0]
+df_mark = df.filter(df["department"] == "marketing").groupBy().max("salary").collect()[0][0]
+
+diff = abs(df_eng - df_mark)
+diff
+
+sol = spark.createDataFrame([{"diff_sal" : diff}])
+sol.show()
+
+
