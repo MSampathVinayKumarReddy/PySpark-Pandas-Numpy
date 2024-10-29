@@ -1,0 +1,21 @@
+Question - https://platform.stratascratch.com/coding/10356-finding-doctors?code_type=5
+
+Google
+
+SQL
+-----------
+SELECT first_name, last_name
+FROM employee_list
+WHERE last_name = 'Johnson' and profession = 'Doctor'
+
+Pandas
+-------------
+import pandas as pd
+
+df = employee_list[(employee_list["profession"] == "Doctor") & (employee_list["last_name"] == "Johnson")][["first_name", "last_name"]]
+df
+
+PySpark
+------------
+sol = employee_list.filter("last_name == 'Johnson' and profession = 'Doctor'")["first_name", "last_name"]
+sol.show()
