@@ -14,3 +14,33 @@ select user_count, (start_timestamp + ' TO ' + end_timestamp) AS time_period,
 device_type
 from cte
 where rn = 1
+
+
+Pandas
+-------------
+import pandas as pd
+
+user_activity['rn'] = user_activity.groupby('device_type')['user_count'].rank(method='dense', ascending=False)
+
+filtered_df = user_activity[user_activity['rn'] == 1]
+
+filtered_df['time_period'] = filtered_df['start_timestamp'].astype(str) + ' TO ' + filtered_df['end_timestamp'].astype(str)
+
+result = filtered_df[['user_count', 'time_period', 'device_type']]
+
+result
+
+
+PySpark
+-----------------
+
+from pyspark.sql.window import Window
+import pyspark.sql.functions as F
+
+ranked_df = user_activity.withColumn('rn', F.dense_rank().over(Window.partitionBy("device_type").orderBy(F.desc("user_count"))))
+
+top_df = ranked_df.filter("rn == 1")
+
+concat_df = top_df.withColumn("time_period", F.concat_ws(" TO ", top_df["start_timestamp"], top_df["end_timestamp"]))[['user_count', 'time_period', 'device_type']]
+
+concat_df.show()
