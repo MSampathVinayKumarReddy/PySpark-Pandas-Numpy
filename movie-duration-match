@@ -1,0 +1,34 @@
+Question - https://platform.stratascratch.com/coding/10360-movie-duration-match?code_type=5
+
+Amazon
+
+SQL
+-----------
+select a.flight_id, b.movie_id, b.duration
+from flight_schedule as a
+join entertainment_catalog as b
+on a.flight_duration > b.duration
+where a.flight_id = '101'
+order by b.duration 
+
+
+Pandas - used cross join to get all combinations and then took where flight_druation > film_duration
+-----------
+import pandas as pd
+
+flight_101 = flight_schedule[flight_schedule["flight_id"] == 101]
+
+merged = pd.merge(flight_101, entertainment_catalog, how = "cross" )
+
+sol = merged[merged["flight_duration"] > merged["duration"]][['flight_id', 'movie_id', 'duration']]
+sol
+
+
+
+PySpark
+------------
+flight_101 = flight_schedule.filter("flight_id = '101'")
+merged = flight_101.join(entertainment_catalog, flight_101.flight_duration > entertainment_catalog.duration)[["flight_id", "movie_id","duration"]].orderBy("duration")
+
+merged.show()
+
