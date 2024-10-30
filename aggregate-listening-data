@@ -1,0 +1,32 @@
+Question - https://platform.stratascratch.com/coding/10367-aggregate-listening-data?code_type=5
+
+Spotify
+
+SQL
+------------------
+select user_id, round((sum(listen_duration)/60), 0) as total_listen_duration,
+count(distinct song_id) as unique_song_count
+from listening_habits
+group by user_id
+
+Pandas
+-------------------
+import pandas as pd
+
+df = listening_habits.groupby("user_id").agg(listen_duration = ("listen_duration", "sum"), unique_songs = ("song_id", "nunique")).reset_index()
+df["listen_minutes"] = (df["listen_duration"]/60).round()
+
+df[["user_id", "listen_minutes", "unique_songs"]]
+
+PySpark
+--------------------
+
+import pyspark.sql.functions as F
+
+df1 = listening_habits.groupBy("user_id").agg(F.sum("listen_duration").alias("total_duration"),F.countDistinct("song_id").alias("unique_songs"))
+
+df2 = df1.withColumn("duration_minutes", F.round(df1["total_duration"]/60))
+
+df3 = df2.select("user_id", "duration_minutes", "unique_songs")
+
+df3.toPandas()
