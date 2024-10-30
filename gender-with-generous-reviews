@@ -1,0 +1,43 @@
+Question - https://platform.stratascratch.com/coding/10149-gender-with-generous-reviews?code_type=2
+
+Airbnb
+
+SQL
+--------------------
+select top(1)
+b.gender,
+AVG(CAST((review_score) AS float)) AS avg_review
+from airbnb_reviews as a
+join airbnb_guests as b
+on a.from_user = b.guest_id
+where a.from_type = 'guest'
+group by b.gender
+order by avg(review_score) desc
+
+Pandas
+-------------------
+import pandas as pd
+
+airbnb_guests_1 = airbnb_reviews[airbnb_reviews["from_type"] == "guest"]
+
+df1 = pd.merge(airbnb_guests_1, airbnb_guests, left_on = "from_user", right_on = "guest_id")
+df2 = df1.groupby("gender").agg(average_rating = ("review_score", "mean")).reset_index()
+
+df2 = df2.sort_values(by = "average_rating", ascending = False)
+
+df2.head(1)
+
+PySpark
+--------------------
+import pyspark.sql.functions as F
+
+filtered_reviews = airbnb_reviews.filter("from_type = 'guest'")
+
+joined = filtered_reviews.join(airbnb_guests, filtered_reviews.from_user == airbnb_guests.guest_id)
+
+joined = joined.groupBy("gender").agg(F.round(F.avg("review_score"), 2).alias("avg_score"))
+
+joined = joined.orderBy("avg_score", ascending = False)
+
+joined.limit(1).show()
+
