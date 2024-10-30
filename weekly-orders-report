@@ -1,0 +1,29 @@
+Question - https://platform.stratascratch.com/coding/10363-weekly-orders-report/official-solution?code_type=5
+
+Amazon
+
+SQL
+---------
+select week, sum(quantity) as quantity
+from orders_analysis
+where week >= '2023-01-01' and week <= '2023-03-31'
+group by week
+
+
+Pandas
+-----------
+import pandas as pd
+
+df = orders_analysis[(orders_analysis["week"] >= '2023-01-01') & (orders_analysis["week"] <= '2023-03-31')]
+df1 = df.groupby("week")["quantity"].sum().reset_index()
+
+df1
+
+PySpark
+-------------
+import pyspark.sql.functions as F
+
+df = orders_analysis[(orders_analysis["week"] >= '2023-01-01') & (orders_analysis["week"] <= '2023-03-31')]
+df1 = df.groupBy("week").agg(F.sum("quantity").alias("quant"))
+
+df1.show()
