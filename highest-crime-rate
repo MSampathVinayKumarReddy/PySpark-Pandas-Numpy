@@ -1,0 +1,23 @@
+Question - https://platform.stratascratch.com/coding/10132-highest-crime-rate?code_type=2
+
+City of San Fransico
+
+SQL
+-----------
+select day_of_week, count(*)
+from sf_crime_incidents_2014_01
+group by day_of_week
+
+Pandas
+-----------
+import pandas as pd
+
+df1 = sf_crime_incidents_2014_01.groupby("day_of_week").agg(crime_count = ("incidnt_num", "count")).reset_index()
+df1
+
+PySpark
+--------------
+import pyspark.sql.functions as F
+
+df = sf_crime_incidents_2014_01.groupBy("day_of_week").agg(F.count("incidnt_num").alias("crime_count"))
+df.show()
