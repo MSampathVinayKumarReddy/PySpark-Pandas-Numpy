@@ -1,0 +1,49 @@
+Question - https://platform.stratascratch.com/coding/10362-top-monthly-sellers?code_type=2
+
+Amazon
+
+SQL
+-----------
+select product_category, seller_id, total_sales, market_place, month 
+from (
+select seller_id, total_sales, product_category, market_place, month,
+dense_rank() over(partition by product_category order by total_sales desc) as rn
+from sales_data
+where month = '2024-01'
+)x
+where x.rn <= '3'
+
+Pandas
+-------------
+import pandas as pd
+
+filtered_data = sales_data[sales_data['month'] == '2024-01']
+filtered_data['rn'] = filtered_data.groupby('product_category')['total_sales'].rank(method='dense', ascending=False)
+top_sellers = filtered_data[filtered_data['rn'] <= 3]
+result = top_sellers[['product_category', 'seller_id', 'total_sales', 'market_place', 'month']]
+
+result
+
+PySpark
+-------------
+from pyspark.sql.window import Window
+import pyspark.sql.functions as F
+
+df1 = sales_data.filter("month == '2024-01'")
+
+logic = Window.partitionBy("product_category").orderBy(F.desc("total_sales"))
+
+df2 = df1.withColumn("rn", F.dense_rank().over(logic))
+
+final = df2.filter("rn <= 3")[['product_category', 'seller_id', 'total_sales', 'market_place', 'month']]
+
+final.show()
+
+
+
+
+
+
+
+
+
