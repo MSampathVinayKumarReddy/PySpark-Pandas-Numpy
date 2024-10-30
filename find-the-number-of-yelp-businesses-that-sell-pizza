@@ -1,0 +1,30 @@
+Question - https://platform.stratascratch.com/coding/10153-find-the-number-of-yelp-businesses-that-sell-pizza?code_type=2
+
+Yelp
+
+SQL
+----------
+select count(distinct business_id)
+from yelp_business
+where lower(categories) like '%pizza%'
+
+
+Pandas
+------------
+import pandas as pd
+
+df1 = yelp_business[yelp_business["categories"].str.lower().str.contains('pizza')]
+
+df1["business_id"].nunique()
+
+
+PySpark
+--------------
+
+import pyspark.sql.functions as F
+
+df1 = yelp_business.filter(F.lower(F.col("categories")).contains("pizza"))
+
+sol = df1.select (F.countDistinct("business_id").alias("count_of"))
+
+sol.collect()[0][0]
