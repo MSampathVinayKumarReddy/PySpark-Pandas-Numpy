@@ -1,0 +1,25 @@
+Question - https://platform.stratascratch.com/coding/10143-find-players-who-participated-in-the-olympics-representing-more-than-one-team?code_type=2
+
+ESPN
+
+SQL
+-----------
+SELECT name, team, games, sport, medal
+FROM olympics_athletes_events
+WHERE team LIKE '%/%'
+
+Pandas
+----------
+import pandas as pd
+output_cols = ['name', 'team', 'games', 'sport',  'medal']
+
+df1 = olympics_athletes_events[olympics_athletes_events["team"].str.contains("/")][output_cols]
+df1
+
+PySpark
+-----------
+import pyspark.sql.functions as F
+
+df1 = olympics_athletes_events.filter(F.col("team").contains("/")).select('name', 'team', 'games', 'sport',  'medal')
+
+df1.show()
