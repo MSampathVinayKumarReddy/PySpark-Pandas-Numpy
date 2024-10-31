@@ -1,0 +1,24 @@
+Question - https://platform.stratascratch.com/coding/10164-total-adwords-earnings?code_type=6
+
+Google
+
+SQL
+---------
+select business_type, sum(adwords_earnings)
+from google_adwords_earnings
+group by business_type
+
+Pandas
+------------
+df = google_adwords_earnings.groupby(["business_type"]).sum(["adwords_earnings"]).reset_index()
+
+df[["business_type", "adwords_earnings"]]
+
+
+PySpark
+-------------
+import pyspark.sql.functions as F
+
+df = google_adwords_earnings.groupBy("business_type").agg(F.sum("adwords_earnings").alias("earnings"))
+
+df.toPandas()
