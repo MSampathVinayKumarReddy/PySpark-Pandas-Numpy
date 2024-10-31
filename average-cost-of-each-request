@@ -1,0 +1,25 @@
+Question - https://platform.stratascratch.com/coding/10007-average-cost-of-each-request?code_type=6
+
+Uber
+
+SQL
+-----------
+
+select request_status, avg(monetary_cost) as avg_cost
+from uber_ride_requests
+group by request_status
+
+Pandas
+-----------
+df1 = uber_ride_requests.groupby(["request_status"]).agg(cost = ("monetary_cost", "mean")).reset_index()
+
+df1
+
+
+PySpark
+------------
+import pyspark.sql.functions as F
+
+py_df = uber_ride_requests.groupBy("request_status").agg(F.avg("monetary_cost").alias("cost"))
+
+py_df.toPandas()
