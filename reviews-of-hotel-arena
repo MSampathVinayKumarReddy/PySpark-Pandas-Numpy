@@ -1,0 +1,29 @@
+Question - https://platform.stratascratch.com/coding/10166-reviews-of-hotel-arena?code_type=5
+
+Airbnb
+
+SQL
+-----
+select hotel_name, reviewer_score, count(*)
+from hotel_reviews
+where hotel_name = 'Hotel Arena'
+group by hotel_name, reviewer_score
+
+Pandas
+---------
+
+df = hotel_reviews[hotel_reviews["hotel_name"] == "Hotel Arena"]
+
+df_sol = df.groupby(["hotel_name", "reviewer_score"]).agg(no_of_rows = ("reviewer_score", "count")).reset_index()
+
+df_sol
+
+
+PySpark
+------------
+
+py_df = hotel_reviews.filter("hotel_name == 'Hotel Arena'").select("hotel_name", "reviewer_score")
+
+py_df2 = py_df.groupBy(["hotel_name", "reviewer_score"]).count().alias("no_of_rows")
+
+py_df2.toPandas()
