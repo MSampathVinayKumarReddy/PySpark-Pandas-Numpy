@@ -1,0 +1,26 @@
+Question - https://platform.stratascratch.com/coding/10009-find-the-total-costs-and-total-customers-acquired-in-each-year?code_type=6
+
+Uber
+
+SQL
+-------
+select year, sum(money_spent) as money, sum(customers_acquired) as customers
+from uber_advertising
+group by year
+
+
+Pandas
+------------
+df1 = uber_advertising.groupby(["year"]).agg(money = ("money_spent","sum"), customers = ("customers_acquired","sum")).reset_index()
+
+df1
+
+
+PySpark
+------------
+import pyspark.sql.functions as F
+
+py_df = uber_advertising.groupBy(["year"]).agg(F.sum("money_spent").alias("money"), F.sum("customers_acquired").alias("customers"))
+
+
+py_df.show()
