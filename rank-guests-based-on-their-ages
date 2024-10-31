@@ -1,0 +1,30 @@
+Question - https://platform.stratascratch.com/coding/10160-rank-guests-based-on-their-ages?code_type=5
+
+Airbng
+
+SQL
+-------
+select guest_id, rank() over(order by age desc) as rn
+from airbnb_guests
+order by age desc
+
+
+Pandas
+------------
+import pandas as pd
+
+airbnb_guests['rn'] = airbnb_guests["age"].rank(method = "min", ascending = False)
+airbnb_guests.sort_values(by = "rn")[["guest_id", "rn"]]
+
+
+PySpark
+-----------------
+
+from pyspark.sql.window import Window
+import pyspark.sql.functions as F
+
+logic = Window.orderBy(F.desc("age"))
+
+sol = airbnb_guests.withColumn("rn", F.rank().over(logic))
+
+sol.select("guest_id", "rn").show()
