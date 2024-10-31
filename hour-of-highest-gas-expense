@@ -1,0 +1,28 @@
+Question - https://platform.stratascratch.com/coding/10005-hour-of-highest-gas-expense?code_type=6
+
+Lyft
+
+SQL
+--------
+select top(1)
+hour
+from lyft_rides
+group by hour
+order by max(gasoline_cost) desc
+
+Pandas
+----------
+df1 = lyft_rides.groupby("hour")["gasoline_cost"].max().reset_index()
+
+df1.sort_values(by = "gasoline_cost", ascending = False).head(1)["hour"]
+
+
+PySpark
+--------------------
+import pyspark.sql.functions as F
+
+py_df = lyft_rides.groupBy("hour").agg(F.max("gasoline_cost").alias("maxx"))
+
+py_df2 = py_df.orderBy("maxx", ascending = False).select("hour")
+
+py_df2.collect()[0][0]
