@@ -1,0 +1,25 @@
+Question - https://platform.stratascratch.com/coding/10006-find-the-average-distance-traveled-in-each-hour?code_type=6
+
+Lyft
+
+
+SQL
+-------
+select hour, avg(travel_distance) as avg_dist
+from lyft_rides
+group by hour
+order by  hour
+
+Pandas
+----------
+df1 = lyft_rides.groupby(["hour"]).agg(avg_dist = ("travel_distance", "mean")).reset_index()
+
+df1.sort_values(by = "hour")
+
+PySpark
+-------------
+import pyspark.sql.functions as F
+
+py_df = lyft_rides.groupBy("hour").agg(F.avg("travel_distance").alias("avg_dist"))
+
+py_df.orderBy("hour").toPandas()
