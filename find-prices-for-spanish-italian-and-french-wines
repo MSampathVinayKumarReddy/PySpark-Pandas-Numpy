@@ -1,0 +1,26 @@
+Question - https://platform.stratascratch.com/coding/10020-find-prices-for-spanish-italian-and-french-wines?code_type=5
+
+Wine Magazine
+
+SQL
+--------
+SELECT price 
+FROM winemag_p1
+WHERE
+country = 'Spain' OR 
+country = 'Italy' OR 
+country = 'France'
+
+
+Pandas
+-----------
+df = winemag_p1[winemag_p1["country"].isin(['Italy','France','Spain'])]
+
+df[["price"]]
+
+
+PySpark
+----------
+df = winemag_p1.filter(winemag_p1["country"].isin('Italy', 'France', 'Spain'))
+
+df.select("price").show()
