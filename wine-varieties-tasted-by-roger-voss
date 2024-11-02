@@ -1,0 +1,24 @@
+Question - https://platform.stratascratch.com/coding/10024-wine-varieties-tasted-by-roger-voss?code_type=6
+
+Wine Magazine
+
+SQL
+-------------
+SELECT DISTINCT variety
+FROM winemag_p2
+WHERE taster_name = 'Roger Voss' AND region_1 IS NOT NULL
+
+Pandas
+---------------
+df = winemag_p2[(winemag_p2["taster_name"] == 'Roger Voss') ]
+
+df1 = df[~df["region_1"].isnull()]
+
+df1["variety"].unique()
+
+
+PySpark
+---------------
+df = winemag_p2.filter((winemag_p2["taster_name"] == 'Roger Voss') & (winemag_p2["region_1"].isNotNull()))
+
+df.select(["variety"]).distinct().toPandas()
