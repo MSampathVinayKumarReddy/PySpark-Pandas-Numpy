@@ -1,0 +1,21 @@
+Question - https://platform.stratascratch.com/coding/10027-find-the-number-of-us-based-wineries-that-have-expensive-wines-price-200?code_type=6
+
+Wine Magazine
+
+SQL
+-----------------
+select count(distinct winery) 
+from winemag_p1
+where price >= '200' and country = 'US'
+
+
+Pandas
+-----------------
+df = winemag_p1[(winemag_p1["price"] >= 200) & (winemag_p1["country"] == 'US')]
+df["winery"].nunique()
+
+
+PySpark
+-----------------
+df = winemag_p1.filter((winemag_p1["price"] >= 200) & (winemag_p1["country"] == 'US'))
+df.select("winery").distinct().count()
