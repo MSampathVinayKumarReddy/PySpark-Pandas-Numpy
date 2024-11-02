@@ -1,0 +1,22 @@
+Question - https://platform.stratascratch.com/coding/10022-find-all-wine-varieties-which-can-be-considered-cheap-based-on-the-price?code_type=6
+
+Wine Magazine
+
+SQL
+-------------
+select distinct variety
+from winemag_p1
+where price between '5' and '20'
+
+
+Pandas
+--------------
+df = winemag_p1[(winemag_p1["price"] >= 5) & (winemag_p1["price"] <= 20)]
+df["variety"].unique()
+
+
+PySpark
+--------------
+df = winemag_p1.filter((winemag_p1["price"] >= 5) & (winemag_p1["price"] <= 20))
+
+df.select("variety").distinct().toPandas()
