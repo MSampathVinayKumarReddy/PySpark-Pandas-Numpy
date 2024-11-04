@@ -1,0 +1,22 @@
+Question = https://platform.stratascratch.com/coding/10052-find-the-average-number-of-stars-for-each-state?code_type=6
+
+Yelp
+
+SQL
+----------
+select state, avg(stars) as avg_stars 
+from yelp_business
+group by state
+
+Pandas
+-----------
+df = yelp_business.groupby("state").agg(avg_stars = ("stars", "mean")).reset_index()
+df
+
+
+PySpark
+-----------
+import pyspark.sql.functions as F
+
+df = yelp_business.groupBy("state").agg(F.avg("stars").alias("avg_stars"))
+df.toPandas()
