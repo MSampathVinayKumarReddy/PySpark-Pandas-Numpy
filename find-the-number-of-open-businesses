@@ -1,0 +1,21 @@
+Question - https://platform.stratascratch.com/coding/10051-find-the-number-of-open-businesses?code_type=6
+
+Yelp
+
+SQL
+------------
+select count(*) as open_business
+from yelp_business
+where is_open = '1'
+
+Pandas
+------------
+df = yelp_business[yelp_business["is_open"] == 1]
+
+len(df["business_id"])
+
+
+PySpark
+------------
+df = yelp_business.filter(yelp_business["is_open"] == 1)
+df.select("business_id").count()
