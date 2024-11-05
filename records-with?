@@ -1,0 +1,22 @@
+Question - https://platform.stratascratch.com/coding/10055-records-with?code_type=5
+
+Yelp
+
+SQL
+--------
+select * 
+from yelp_reviews
+where stars = '?'
+
+
+Pandas
+----------
+df = yelp_reviews[yelp_reviews["stars"] == '?']
+df
+
+
+PySpark
+-----------
+df = yelp_reviews.filter(yelp_reviews["stars"] == '?')
+
+df.show()
