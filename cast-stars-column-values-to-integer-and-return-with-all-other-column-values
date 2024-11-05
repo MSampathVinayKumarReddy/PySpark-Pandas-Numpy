@@ -1,0 +1,21 @@
+Question - https://platform.stratascratch.com/coding/10056-cast-stars-column-values-to-integer-and-return-with-all-other-column-values?code_type=5
+
+Yelp
+
+SQL
+-------------
+select business_name, review_id,user_id,CAST(stars AS INT) AS stars,review_date,review_text,funny,useful,cool
+from yelp_reviews
+where stars <> '?'
+
+Pandas
+-------------
+df = yelp_reviews[yelp_reviews["stars"] != '?']
+df
+
+PySpark
+----------------
+
+df = yelp_reviews.filter(yelp_reviews["stars"] != '?')
+
+df.show()
