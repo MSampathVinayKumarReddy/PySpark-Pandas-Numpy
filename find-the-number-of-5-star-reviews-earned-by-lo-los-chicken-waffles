@@ -1,0 +1,22 @@
+Q - https://platform.stratascratch.com/coding/10057-find-the-number-of-5-star-reviews-earned-by-lo-los-chicken-waffles?code_type=5
+
+Yelp
+
+SQL
+-----------
+select count(*)
+from yelp_reviews
+where business_name = 'Lo-Lo''s Chicken & Waffles' AND stars = '5'
+
+Pandas
+-----------
+lolo = yelp_reviews[(yelp_reviews['stars'] == '5') &(yelp_reviews['business_name'] == "Lo-Lo's Chicken & Waffles")]
+lolo = len(lolo)
+
+PySpark
+--------------
+import pyspark.sql.functions as F
+
+yelp_reviews = yelp_reviews.filter((F.col('stars') == '5') & (F.col('business_name') == "Lo-Lo's Chicken & Waffles"))
+result = yelp_reviews.count()
+result
