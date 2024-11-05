@@ -1,0 +1,30 @@
+Q - https://platform.stratascratch.com/coding/10061-popularity-of-hack?code_type=6
+
+Meta
+
+SQL
+-----------
+select a.location, avg(cast(popularity as float)) as avg_pop
+from facebook_employees as a
+join facebook_hack_survey as b
+on a.id = b.employee_id
+group by a.location
+
+Pandas
+------------
+import pandas as pd
+
+df = pd.merge(facebook_employees, facebook_hack_survey, left_on = "id", right_on = "employee_id")
+df1 = df.groupby("location").agg(avgg = ("popularity", "mean")).reset_index()
+
+df1
+
+
+PySpark
+-----------
+import pyspark.sql.functions as F
+
+df = facebook_employees.join(facebook_hack_survey, facebook_employees.id == facebook_hack_survey.employee_id)
+df1 = df.groupBy("location").agg(F.avg("popularity").alias("avgg"))
+
+df1.toPandas()
