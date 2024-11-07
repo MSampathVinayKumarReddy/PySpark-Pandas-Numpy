@@ -1,0 +1,36 @@
+Q - https://platform.stratascratch.com/coding/10543-second-highest-salary?code_type=6
+
+KPMNG
+
+SQL
+-------------
+with cte as 
+(
+select department, salary, employee_id,
+dense_rank() over(partition by department order by salary desc) as rn
+from employee_data
+)
+select department, salary, employee_id
+from cte
+where rn = 2
+
+
+Pandas
+--------------
+employee_data["rn"] = employee_data.groupby(["department"])["salary"].rank(method="dense", ascending = False)
+sol = employee_data[employee_data["rn"] == 2][['department', 'salary', 'employee_id']]
+sol
+
+
+PySpark
+-------------
+from pyspark.sql.functions import dense_rank
+from pyspark.sql.window import Window
+
+windowSpec = Window.partitionBy('department').orderBy(employee_data['salary'].desc())
+
+df_with_rank = employee_data.withColumn('rn', dense_rank().over(windowSpec))
+
+result = df_with_rank.filter(df_with_rank.rn == 2).select('department', 'salary', 'employee_id')
+
+result.show()
