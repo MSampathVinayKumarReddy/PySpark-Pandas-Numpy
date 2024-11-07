@@ -33,4 +33,4 @@ df_with_rank = employee_data.withColumn('rn', dense_rank().over(windowSpec))
 
 result = df_with_rank.filter(df_with_rank.rn == 2).select('department', 'salary', 'employee_id')
 
-result.show()
+result.show() 
