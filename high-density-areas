@@ -1,0 +1,39 @@
+Question - https://platform.stratascratch.com/coding/10544-high-density-areas?code_type=6
+
+Visa
+
+SQL
+----------
+select top(3)
+b.area_name, count(distinct a.customer_id)/cast(b.area_size as float)  as cust_density
+from transaction_records as a
+join stores as b
+on a.store_id = b.store_id
+group by b.area_name, b.area_size
+order by count(distinct a.customer_id)/cast(b.area_size as float)  desc
+
+Pandas
+----------
+import pandas as pd
+
+df = pd.merge(transaction_records, stores, on = "store_id", how="inner")
+
+df1 = df.groupby(["area_name", "area_size"])["customer_id"].nunique().reset_index()
+
+df1["cust_density"] = df1["customer_id"] / df1["area_size"].astype(float)
+
+df1[['area_name', 'cust_density']].sort_values(by = "cust_density", ascending=False).head(3)
+
+
+PySpark
+----------
+import pyspark.sql.functions as F
+df = transaction_records.join(stores, transaction_records.store_id == stores.store_id)
+
+df1 = df.groupBy(["area_name", "area_size"]).agg(F.countDistinct("customer_id").alias("dist_cust_count"))
+
+df1 = df1.withColumn("dens", df1["dist_cust_count"] / df["area_size"].cast("float"))
+
+final = df1.orderBy("dens", ascending = False)
+
+final.select("area_name", "dens").limit(3).toPandas()
