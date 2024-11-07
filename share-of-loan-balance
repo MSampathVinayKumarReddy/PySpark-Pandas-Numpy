@@ -1,0 +1,40 @@
+Q - https://platform.stratascratch.com/coding/2001-share-of-loan-balance?code_type=6
+
+Credit Acceptance
+
+SQL
+----------------
+select 
+a.rate_type, a.loan_id, a.balance, 100 * a.balance / b.total as perc
+from submissions a
+join (select rate_type, sum(balance) as total
+from submissions
+group by rate_type) b
+on a.rate_type = b.rate_type
+
+
+Pandas
+---------------
+import pandas as pd
+
+df = submissions.groupby(["rate_type"])["balance"].sum().reset_index()
+
+df2 = pd.merge(submissions, df, on = "rate_type")[["rate_type", "loan_id", "balance_x", "balance_y"]]
+
+df2["perc"] = 100 * df2["balance_x"] / df2["balance_y"]
+
+df2[["rate_type", "loan_id", "balance_x", "perc"]]
+
+
+
+PySpark
+---------------
+import pyspark.sql.functions as F
+
+df = submissions.groupBy(["rate_type"]).agg(F.sum("balance").alias("total"))
+
+merged = submissions.join(df, on = "rate_type").select("rate_type", "loan_id", "balance", "total")
+
+merged = merged.withColumn("perc", 100 * merged["balance"] / merged["total"])
+
+merged.select("rate_type", "loan_id", "balance", "perc").show()
