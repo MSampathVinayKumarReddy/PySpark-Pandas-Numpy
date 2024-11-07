@@ -1,0 +1,27 @@
+Q - https://platform.stratascratch.com/coding/2000-variable-vs-fixed-rates?code_type=6
+
+Credit Karma
+
+SQL
+--------------
+select loan_id, 
+case when rate_type = 'variable' then 1 else 0 end as 'variable',
+case when rate_type = 'fixed' then 1 else 0 end as 'fixed'
+from submissions
+
+
+Pandas
+---------------
+submissions["variable"] = submissions["rate_type"].apply(lambda x: 1 if x == "variable" else 0)
+submissions["fixed"] = submissions["rate_type"].apply(lambda x: 1 if x == "fixed" else 0)
+
+submissions[["loan_id", "variable", "fixed"]]
+
+
+PySpark
+---------------
+import pyspark.sql.functions as F
+
+df1 = submissions.withColumn("variable", F.when(F.col("rate_type") == "variable", 1).otherwise(0)).withColumn("fixed", F.when(F.col("rate_type") == "fixed", 1).otherwise(0))
+
+df1.select("loan_id", "variable", "fixed").show()
