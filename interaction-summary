@@ -26,10 +26,10 @@ Pandas
 import pandas as pd
 
 interaction_counts = customer_interactions.groupby('customer_id')['interaction_id'].count().reset_index(name='interactions')
+
 content_counts = user_content.groupby('customer_id')['content_id'].count().reset_index(name='content_items')
 
 result = pd.merge(interaction_counts, content_counts, on='customer_id', how='outer').fillna(0)
-
 result
 
 
