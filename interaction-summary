@@ -1,0 +1,48 @@
+Q - https://platform.stratascratch.com/coding/10542-interaction-summary?code_type=6
+
+IBM
+
+SQL
+--------------------
+with cte as
+(
+select customer_id, count(interaction_type) as val, 'int' as tablefrom
+from customer_interactions 
+group by customer_id
+union all
+select customer_id, count(content_type) as val, 'cont' as tablefrom
+from user_content 
+group by customer_id
+)
+select customer_id, 
+sum(case when tablefrom = 'int' then val else 0 end) as interactions,
+sum(case when tablefrom = 'cont' then val else 0 end) as content_items
+from cte
+group by customer_id
+
+
+Pandas
+----------------------
+import pandas as pd
+
+interaction_counts = customer_interactions.groupby('customer_id')['interaction_id'].count().reset_index(name='interactions')
+content_counts = user_content.groupby('customer_id')['content_id'].count().reset_index(name='content_items')
+
+result = pd.merge(interaction_counts, content_counts, on='customer_id', how='outer').fillna(0)
+
+result
+
+
+PySpark
+-------------------------
+import pyspark.sql.functions as F
+
+i_counts = customer_interactions.groupBy("customer_id").agg(F.count("interaction_id").alias("i-counts"))
+c_counts = user_content.groupBy("customer_id").agg(F.count("content_id").alias("c-counts"))
+
+sol = i_counts.join(c_counts, on = "customer_id", how = "outer")
+
+sol = sol.withColumn("inter", F.coalesce(F.col("i-counts"), F.lit(0))).withColumn("cont", F.coalesce(F.col("c-counts"), F.lit(0)))
+
+sol.select("customer_id", "inter", "cont").toPandas()
+
