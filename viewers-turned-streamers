@@ -1,0 +1,56 @@
+Q - https://platform.stratascratch.com/coding/2012-viewers-turned-streamers?code_type=6
+
+Twitch
+
+SQL
+------------------------
+with cte as
+(
+select user_id, session_start, session_type,
+row_number() over(partition by user_id order by session_start) as rn
+from twitch_sessions
+)
+select user_id, count(session_id) as sessions
+from twitch_sessions
+where user_id in (
+select user_id 
+from cte
+where rn = 1 and session_type = 'viewer'
+) and session_type = 'streamer'
+group by user_id
+order by count(session_id) desc
+
+
+Pandas
+--------------------------
+import pandas as pd
+
+twitch_sessions["rn"] = twitch_sessions.groupby('user_id')['session_start'].rank(method='first', ascending=True)
+
+user_ids = twitch_sessions[(twitch_sessions['rn'] == 1) & (twitch_sessions['session_type'] == 'viewer')]['user_id'].tolist()
+
+sol = twitch_sessions[(twitch_sessions['user_id'].isin(user_ids)) & (twitch_sessions['session_type'] == "streamer")].groupby('user_id').agg(cnt = ("session_id", "count")).reset_index()
+
+sol.sort_values(by= "cnt", ascending = False)
+
+
+
+
+PySpark
+-----------------------
+import pyspark.sql.functions as F
+from pyspark.sql.window import Window
+
+window_code = Window.partitionBy('user_id').orderBy(twitch_sessions['session_start'])
+
+twitch_sessions = twitch_sessions.withColumn('rn', F.row_number().over(window_code))
+
+user_ids = twitch_sessions.filter((twitch_sessions['rn'] == 1) & (twitch_sessions['session_type'] == 'viewer')).select('user_id').collect()
+
+result = [row["user_id"] for row in user_ids]
+
+sol = twitch_sessions.filter((twitch_sessions['user_id'].isin(result)) & (twitch_sessions['session_type'] == 'streamer')).select('user_id', 'session_id')
+
+final = sol.groupBy('user_id').agg(F.count('session_id').alias("count_of_sessions"))
+
+final.orderBy("count_of_sessions", ascending = False).show()
