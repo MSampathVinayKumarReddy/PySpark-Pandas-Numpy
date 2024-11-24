@@ -1,0 +1,84 @@
+Q - https://platform.stratascratch.com/coding/2007-rank-variance-per-country?code_type=6
+
+Meta
+
+SQL
+----------------------
+with dec_cte as
+(
+select country,
+sum(number_of_comments) as comments,
+dense_rank() over(order by sum(number_of_comments) desc) as rnk
+from fb_comments_count as a
+join fb_active_users as b
+on a.user_id = b.user_id 
+where a.created_at between '2019-12-01' and '2019-12-31'
+group by b.country
+), jan_cte as
+(
+select country,
+sum(number_of_comments) as comments,
+dense_rank() over(order by sum(number_of_comments) desc) as rnk
+from fb_comments_count as a
+join fb_active_users as b
+on a.user_id = b.user_id 
+where a.created_at between '2020-01-01' and '2020-01-31'
+group by b.country
+)
+select j.country
+from jan_cte as j
+left join dec_cte as d
+on j.country = d.country
+where j.rnk < d.rnk or d.country is NULL
+
+
+Pandas
+------------------------------
+import pandas as pd
+
+fb_com = fb_comments_count[(fb_comments_count["created_at"].dt.year == 2020) & (fb_comments_count["created_at"].dt.month == 1)]
+jan = pd.merge(fb_com, fb_active_users, on = 'user_id')[['number_of_comments', 'country']]
+jan = jan.groupby(['country']).sum(["number_of_comments"]).reset_index()
+jan["rn"] = jan['number_of_comments'].rank(method="dense", ascending = False)
+
+
+fb_com_dec = fb_comments_count[(fb_comments_count["created_at"].dt.year == 2019) & (fb_comments_count["created_at"].dt.month == 12)]
+dec = pd.merge(fb_com_dec, fb_active_users, on = 'user_id')[['number_of_comments', 'country']]
+dec = dec.groupby(['country']).sum(["number_of_comments"]).reset_index()
+dec["rn"] = dec['number_of_comments'].rank(method="dense", ascending = False)
+
+
+final = pd.merge(jan, dec, on = 'country', how = 'left')
+
+final[(final['rn_x'] < final['rn_y']) | (final['rn_y'].isnull())]['country']
+
+
+PySpark
+---------------------------------
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+
+fb_com = fb_comments_count.filter(
+    (F.year(fb_comments_count['created_at']) == 2020) & (F.month(fb_comments_count['created_at']) == 1)
+)
+
+jan = fb_com.join(fb_active_users, on='user_id', how='inner').select('number_of_comments', 'country')
+jan = jan.groupBy('country').agg(F.sum('number_of_comments').alias('number_of_comments'))
+window_spec = Window.orderBy(F.desc('number_of_comments'))
+jan = jan.withColumn('rn', F.dense_rank().over(window_spec))
+
+
+fb_com_dec = fb_comments_count.filter(
+    (F.year(fb_comments_count['created_at']) == 2019) & (F.month(fb_comments_count['created_at']) == 12)
+)
+
+
+dec = fb_com_dec.join(fb_active_users, on='user_id', how='inner').select('number_of_comments', 'country')
+dec = dec.groupBy('country').agg(F.sum('number_of_comments').alias('number_of_comments'))
+dec = dec.withColumn('rn', F.dense_rank().over(window_spec))
+
+final = jan.join(dec, on='country', how='left')
+result = final.filter((final['rn'] < final['rn_y']) | final['rn_y'].isNull()).select('country')
+
+result.show()
+
