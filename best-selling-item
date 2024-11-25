@@ -1,0 +1,55 @@
+Q - https://platform.stratascratch.com/coding/10172-best-selling-item?code_type=6
+
+Amazon
+
+SQL
+---------------------
+with cte as
+(
+select month(invoicedate) as month_,
+description,
+sum(quantity * unitprice) as amt,
+dense_rank() over(partition by month(invoicedate) order by sum(quantity * unitprice) desc) as rn
+from online_retail 
+group by month(invoicedate), description
+)
+select month_, description, amt
+from cte
+where rn = '1'
+
+
+Pandas
+---------------------
+import pandas as pd
+
+online_retail['month_'] = online_retail['invoicedate'].dt.month
+online_retail['amount_'] = online_retail['quantity'] * online_retail['unitprice']
+
+online_retail = online_retail.groupby(['month_', 'description']).sum(['amount_']).reset_index()
+
+online_retail['rn'] = online_retail.groupby('month_')['amount_'].rank(method='dense', ascending=False)
+
+result = online_retail[online_retail['rn'] == 1][['month_', 'description', 'amount_']]
+
+result.head(12)
+
+
+
+PySpark
+----------------------
+import pyspark.sql.functions as F
+from pyspark.sql.window import Window
+
+online_retail = online_retail.withColumn("month_", F.month(online_retail['invoicedate']))
+
+online_retail = online_retail.withColumn("amt", online_retail['quantity'] * online_retail['unitprice'])
+
+grouped = online_retail.groupBy("month_", "description").agg(F.sum("amt").alias("amt"))
+
+windowSpec = Window.partitionBy("month_").orderBy(F.col("amt").desc())
+
+grouped_with_rank = grouped.withColumn("rn", F.dense_rank().over(windowSpec))
+
+result = grouped_with_rank.filter(grouped_with_rank['rn'] == 1).select("month_", "description", "amt")
+
+result.show()
